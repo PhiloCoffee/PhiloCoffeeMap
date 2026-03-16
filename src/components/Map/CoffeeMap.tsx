@@ -1,10 +1,10 @@
 'use client';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
-  APIProvider,
   Map,
   AdvancedMarker,
   MapMouseEvent,
+  useMap,
 } from '@vis.gl/react-google-maps';
 import CoffeePin from './CoffeePin';
 import type { CoffeeSpot } from '@/types';
@@ -32,7 +32,27 @@ interface CoffeeMapProps {
   onMapClick: (lat: number, lng: number) => void;
 }
 
-function MapInner({ spots, selectedSpot, pendingLat, pendingLng, onSpotClick, onMapClick }: CoffeeMapProps) {
+/** Pan to user's location on first load (must be child of <Map>) */
+function MapGeolocation() {
+  const map = useMap();
+  useEffect(() => {
+    if (!map || !navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        map.panTo({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        map.setZoom(14);
+      },
+      () => {} // fallback: stay at Taipei default
+    );
+  }, [map]);
+  return null;
+}
+
+export default function CoffeeMap({
+  spots, selectedSpot, pendingLat, pendingLng, onSpotClick, onMapClick,
+}: CoffeeMapProps) {
+  const mapId = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID;
+
   const handleMapClick = useCallback(
     (e: MapMouseEvent) => {
       if (!e.detail?.latLng) return;
@@ -50,10 +70,13 @@ function MapInner({ spots, selectedSpot, pendingLat, pendingLng, onSpotClick, on
       mapTypeControl={false}
       streetViewControl={false}
       fullscreenControl={false}
-      styles={ESPRESSO_MAP_STYLE}
+      mapId={mapId}
+      styles={mapId ? undefined : ESPRESSO_MAP_STYLE}
       onClick={handleMapClick}
       className="w-full h-full"
     >
+      <MapGeolocation />
+
       {spots.map((spot) => (
         <AdvancedMarker
           key={spot.id}
@@ -71,15 +94,5 @@ function MapInner({ spots, selectedSpot, pendingLat, pendingLng, onSpotClick, on
         </AdvancedMarker>
       )}
     </Map>
-  );
-}
-
-export default function CoffeeMap(props: CoffeeMapProps) {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
-
-  return (
-    <APIProvider apiKey={apiKey}>
-      <MapInner {...props} />
-    </APIProvider>
   );
 }

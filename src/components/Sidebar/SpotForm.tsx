@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import PhotoGallery from '@/components/UI/PhotoGallery';
 import EspressoLoader from '@/components/UI/EspressoLoader';
 import type { CoffeeSpot, CoffeeSpotInput, Vibe } from '@/types';
@@ -36,8 +37,32 @@ export default function SpotForm({ initialLat, initialLng, existingSpot, onSave,
   const [saving, setSaving] = useState(false);
   const [geocoding, setGeocoding] = useState(false);
 
-  const lat = existingSpot?.lat ?? initialLat ?? 0;
-  const lng = existingSpot?.lng ?? initialLng ?? 0;
+  // Internal lat/lng: can be updated by Places Autocomplete
+  const [lat, setLat] = useState(existingSpot?.lat ?? initialLat ?? 25.0);
+  const [lng, setLng] = useState(existingSpot?.lng ?? initialLng ?? 121.5);
+
+  // Places Autocomplete
+  const placesLib = useMapsLibrary('places');
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!placesLib || !nameInputRef.current) return;
+
+    const ac = new placesLib.Autocomplete(nameInputRef.current, {
+      types: ['establishment'],
+      fields: ['name', 'formatted_address', 'geometry'],
+    });
+
+    ac.addListener('place_changed', () => {
+      const place = ac.getPlace();
+      if (place.name) setName(place.name);
+      if (place.formatted_address) setAddress(place.formatted_address);
+      if (place.geometry?.location) {
+        setLat(place.geometry.location.lat());
+        setLng(place.geometry.location.lng());
+      }
+    });
+  }, [placesLib]);
 
   async function handleGeocode() {
     setGeocoding(true);
@@ -90,17 +115,21 @@ export default function SpotForm({ initialLat, initialLng, existingSpot, onSave,
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
-        {/* Name */}
+        {/* Name — with Places Autocomplete */}
         <div>
           <label className="block text-cream/70 text-xs mb-1">Name *</label>
           <input
+            ref={nameInputRef}
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            placeholder="Coffee shop name"
+            placeholder="Search coffee shop…"
             className="input-field w-full"
           />
+          {placesLib && (
+            <p className="text-cream/30 text-xs mt-1">Type to search for a coffee shop</p>
+          )}
         </div>
 
         {/* Address */}
