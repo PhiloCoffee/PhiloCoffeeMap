@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#1C0A00"/>
+  <!-- Coffee cup body -->
+  <rect x="136" y="200" width="240" height="180" rx="20" fill="#3D1A00" stroke="#C4783A" stroke-width="8"/>
+  <!-- Cup handle -->
+  <path d="M376 240 C440 240 440 340 376 340" stroke="#C4783A" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <!-- Saucer -->
+  <ellipse cx="256" cy="390" rx="140" ry="24" fill="#C4783A" opacity="0.7"/>
+  <!-- Steam wisps -->
+  <path d="M200 180 Q190 150 200 120" stroke="#E8D5B7" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.5"/>
+  <path d="M256 160 Q246 130 256 100" stroke="#E8D5B7" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.5"/>
+  <path d="M312 180 Q302 150 312 120" stroke="#E8D5B7" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.5"/>
+  <!-- φ symbol -->
+  <text x="256" y="320" text-anchor="middle" dominant-baseline="middle" font-family="serif" font-size="120" font-weight="bold" fill="#D4AF37">φ</text>
+</svg>

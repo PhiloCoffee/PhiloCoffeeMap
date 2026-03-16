@@ -1,26 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ─── Tailwind v4 Theme Tokens ──────────────────────────────── */
+@theme {
+  --color-espresso:    #1C0A00;
+  --color-roasted:     #3D1A00;
+  --color-caramel:     #C4783A;
+  --color-cream:       #E8D5B7;
+  --color-foam:        #F5ECD7;
+  --color-symbol-gold: #D4AF37;
+
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-lora:     'Lora', Georgia, serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ─── Base ───────────────────────────────────────────────────── */
+html, body {
+  background-color: #1C0A00;
+  color: #E8D5B7;
+  font-family: 'Lora', Georgia, serif;
+  height: 100%;
+  margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Custom Scrollbar ───────────────────────────────────────── */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: #1C0A00; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #C4783A; border-radius: 2px; }
+
+/* ─── Animations ─────────────────────────────────────────────── */
+@keyframes espresso-fill {
+  0%   { height: 0%; }
+  100% { height: 100%; }
+}
+@keyframes steam-rise {
+  0%   { opacity: 0; transform: translateY(0) scaleX(1); }
+  50%  { opacity: 0.6; transform: translateY(-8px) scaleX(1.3); }
+  100% { opacity: 0; transform: translateY(-16px) scaleX(0.8); }
+}
+@keyframes slide-in {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.animate-espresso-fill { animation: espresso-fill 1.8s ease-in-out infinite; }
+.animate-steam-rise    { animation: steam-rise 1.8s ease-in-out infinite; }
+.animate-slide-in      { animation: slide-in 0.3s ease-out; }
+.animate-fade-in       { animation: fade-in 0.3s ease-out; }
+
+/* ─── Component Classes ──────────────────────────────────────── */
+.btn-primary {
+  background-color: #C4783A;
+  color: #1C0A00;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: opacity 0.2s;
+  cursor: pointer;
+  border: none;
 }
+.btn-primary:hover { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-secondary {
+  background: transparent;
+  color: #E8D5B7;
+  border: 1px solid rgba(196, 120, 58, 0.4);
+  font-family: 'Playfair Display', Georgia, serif;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+.btn-secondary:hover { border-color: #C4783A; }
+
+.input-field {
+  background-color: #1C0A00;
+  border: 1px solid rgba(196, 120, 58, 0.3);
+  color: #E8D5B7;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: 'Lora', serif;
+}
+.input-field:focus { border-color: #C4783A; }
+.input-field::placeholder { color: rgba(232, 213, 183, 0.3); }
+
+/* Prose overrides for react-markdown */
+.prose h1, .prose h2, .prose h3 { font-family: 'Playfair Display', serif; color: #E8D5B7; }
+.prose p { color: rgba(232, 213, 183, 0.8); line-height: 1.7; }
+.prose a { color: #C4783A; }
+.prose ul, .prose ol { color: rgba(232, 213, 183, 0.8); }
+.prose blockquote { border-left-color: #D4AF37; color: #F5ECD7; font-style: italic; }
+.prose code { color: #D4AF37; background: rgba(196,120,58,0.1); padding: 0.1em 0.3em; border-radius: 3px; }

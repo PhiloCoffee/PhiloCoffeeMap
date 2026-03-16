@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+buglog/
 
 # next.js
 /.next/
@@ -23,6 +24,12 @@
 # misc
 .DS_Store
 *.pem
+
+# Claude / Cursor local settings
+.claude/
+
+# Design documents
+PhiloCoffeeMap_Architecture.pdf
 
 # debug
 npm-debug.log*
