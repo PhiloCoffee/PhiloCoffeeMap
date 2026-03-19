@@ -9,6 +9,7 @@ export const coffeeSpots = pgTable('coffee_spots', {
   notes: text('notes'),
   philosophy_quote: text('philosophy_quote'),
   vibe: text('vibe'),
+  list_type: text('list_type'),
   rating: integer('rating'),
   tags: jsonb('tags').$type<string[]>(),
   photos: jsonb('photos').$type<string[]>(),

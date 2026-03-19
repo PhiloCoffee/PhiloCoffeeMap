@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
-import type { CoffeeSpot, Vibe } from '@/types';
-import { VIBE_LABELS, VIBE_SYMBOLS } from '@/types';
+import type { CoffeeSpot, Vibe, ListType } from '@/types';
+import { VIBE_LABELS, VIBE_SYMBOLS, LIST_TYPE_LABELS, LIST_TYPE_PINS } from '@/types';
 
 interface SpotListProps {
   spots: CoffeeSpot[];
@@ -11,6 +11,7 @@ interface SpotListProps {
 }
 
 const VIBES: Vibe[] = ['study', 'chill', 'social', 'contemplative'];
+const LIST_TYPES: ListType[] = ['favourite', 'friend', 'wantto'];
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -25,23 +26,30 @@ function StarRating({ rating }: { rating: number }) {
 export default function SpotList({ spots, selectedId, onSelect, onImport }: SpotListProps) {
   const [search, setSearch] = useState('');
   const [filterVibe, setFilterVibe] = useState<Vibe | 'all'>('all');
+  const [filterList, setFilterList] = useState<ListType | 'all'>('all');
   const [filterRating, setFilterRating] = useState(0);
 
-  const filtered = spots.filter((s) => {
+  const safeSpots = Array.isArray(spots) ? spots : [];
+  const filtered = safeSpots.filter((s) => {
     const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase()) ||
       (s.address ?? '').toLowerCase().includes(search.toLowerCase()) ||
       (s.tags ?? []).some((t) => t.toLowerCase().includes(search.toLowerCase()));
     const matchesVibe = filterVibe === 'all' || s.vibe === filterVibe;
+    const matchesList = filterList === 'all' || (s.list_type ?? 'favourite') === filterList;
     const matchesRating = filterRating === 0 || (s.rating ?? 0) >= filterRating;
-    return matchesSearch && matchesVibe && matchesRating;
+    return matchesSearch && matchesVibe && matchesList && matchesRating;
   });
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
+      {/* Header with logo */}
       <div className="p-4 border-b border-caramel/20">
         <div className="flex items-center justify-between mb-3">
-          <h1 className="font-playfair text-cream text-xl">PhiloCoffeeMap</h1>
+          <div className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icons/logo-primary-dark.svg" alt="PhiloCoffeeMap" width={36} height={36} className="rounded-md" />
+            <h1 className="font-playfair text-cream text-xl">PhiloCoffeeMap</h1>
+          </div>
           <button
             onClick={onImport}
             className="text-caramel hover:text-cream text-sm border border-caramel/40 rounded px-2 py-1 transition"
@@ -58,13 +66,34 @@ export default function SpotList({ spots, selectedId, onSelect, onImport }: Spot
         />
       </div>
 
-      {/* Filters */}
-      <div className="px-4 py-2 flex gap-2 overflow-x-auto border-b border-caramel/10">
+      {/* List type filter */}
+      <div className="px-4 py-2 flex flex-wrap gap-2 border-b border-caramel/10">
+        <button
+          onClick={() => setFilterList('all')}
+          className={`text-xs px-2 py-1 rounded-full whitespace-nowrap transition ${filterList === 'all' ? 'bg-caramel text-espresso' : 'text-cream/60 border border-caramel/20 hover:border-caramel'}`}
+        >
+          All lists
+        </button>
+        {LIST_TYPES.map((lt) => (
+          <button
+            key={lt}
+            onClick={() => setFilterList(lt === filterList ? 'all' : lt)}
+            className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full whitespace-nowrap transition ${filterList === lt ? 'bg-caramel text-espresso' : 'text-cream/60 border border-caramel/20 hover:border-caramel'}`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LIST_TYPE_PINS[lt]} alt={lt} width={10} height={13} />
+            {LIST_TYPE_LABELS[lt]}
+          </button>
+        ))}
+      </div>
+
+      {/* Vibe + rating filters */}
+      <div className="px-4 py-2 flex flex-wrap gap-2 border-b border-caramel/10">
         <button
           onClick={() => setFilterVibe('all')}
           className={`text-xs px-2 py-1 rounded-full whitespace-nowrap transition ${filterVibe === 'all' ? 'bg-caramel text-espresso' : 'text-cream/60 border border-caramel/20 hover:border-caramel'}`}
         >
-          All
+          All vibes
         </button>
         {VIBES.map((v) => (
           <button
@@ -106,6 +135,14 @@ export default function SpotList({ spots, selectedId, onSelect, onImport }: Spot
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={LIST_TYPE_PINS[spot.list_type ?? 'favourite']}
+                    alt={spot.list_type ?? 'favourite'}
+                    width={12}
+                    height={16}
+                    className="flex-shrink-0"
+                  />
                   {spot.vibe && (
                     <span className="text-symbol-gold text-base">{VIBE_SYMBOLS[spot.vibe as Vibe]}</span>
                   )}
@@ -132,7 +169,7 @@ export default function SpotList({ spots, selectedId, onSelect, onImport }: Spot
 
       <div className="p-3 border-t border-caramel/20 text-center">
         <p className="text-cream/30 text-xs font-lora italic">
-          {filtered.length} / {spots.length} spots · Click map to add
+          {filtered.length} / {safeSpots.length} spots · Click map to add
         </p>
       </div>
     </div>

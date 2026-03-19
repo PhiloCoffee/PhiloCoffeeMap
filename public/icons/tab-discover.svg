@@ -1,0 +1,8 @@
+<svg width="96" height="96" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- Magnifying glass with coffee ring stain as lens -->
+  <circle cx="10" cy="10" r="7" stroke="#2C1810" stroke-width="1.6" fill="none"/>
+  <!-- Inner coffee ring -->
+  <circle cx="10" cy="10" r="4" stroke="#2C1810" stroke-width="0.8" fill="none" opacity="0.4"/>
+  <!-- Handle -->
+  <line x1="15.5" y1="15.5" x2="21" y2="21" stroke="#2C1810" stroke-width="2.1" stroke-linecap="round"/>
+</svg>

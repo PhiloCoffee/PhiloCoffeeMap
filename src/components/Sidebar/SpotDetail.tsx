@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import PhilosophyQuote from '@/components/UI/PhilosophyQuote';
 import PhotoGallery from '@/components/UI/PhotoGallery';
 import type { CoffeeSpot, Vibe } from '@/types';
-import { VIBE_LABELS, VIBE_SYMBOLS } from '@/types';
+import { VIBE_LABELS, VIBE_SYMBOLS, LIST_TYPE_LABELS, LIST_TYPE_PINS } from '@/types';
 
 interface SpotDetailProps {
   spot: CoffeeSpot;
@@ -42,8 +42,15 @@ export default function SpotDetail({ spot, onClose, onEdit, onDelete }: SpotDeta
           <button onClick={onClose} className="text-cream/40 hover:text-cream text-xl flex-shrink-0">×</button>
         </div>
 
-        <div className="flex items-center gap-3 mt-2">
+        <div className="flex items-center gap-3 mt-2 flex-wrap">
           {spot.rating && <StarRating rating={spot.rating} />}
+          {spot.list_type && (
+            <span className="flex items-center gap-1 text-xs bg-caramel/20 text-caramel px-2 py-0.5 rounded-full">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={LIST_TYPE_PINS[spot.list_type]} alt={spot.list_type} width={10} height={13} />
+              {LIST_TYPE_LABELS[spot.list_type]}
+            </span>
+          )}
           {spot.vibe && (
             <span className="text-xs bg-caramel/20 text-caramel px-2 py-0.5 rounded-full">
               {VIBE_LABELS[spot.vibe as Vibe]}

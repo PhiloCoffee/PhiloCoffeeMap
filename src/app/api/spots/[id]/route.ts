@@ -22,9 +22,19 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const [spot] = await db
       .update(coffeeSpots)
       .set({
-        ...body,
+        name: body.name,
+        address: body.address ?? null,
+        lat: body.lat,
+        lng: body.lng,
+        notes: body.notes ?? null,
+        philosophy_quote: body.philosophy_quote ?? null,
+        vibe: body.vibe ?? null,
+        list_type: body.list_type ?? 'favourite',
+        rating: body.rating ?? null,
+        tags: body.tags ?? [],
+        photos: body.photos ?? [],
+        visited_at: body.visited_at ? new Date(body.visited_at) : null,
         updated_at: new Date(),
-        visited_at: body.visited_at ? new Date(body.visited_at) : undefined,
       })
       .where(eq(coffeeSpots.id, parseInt(id)))
       .returning();

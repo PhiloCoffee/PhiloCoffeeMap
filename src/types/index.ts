@@ -14,6 +14,20 @@ export const VIBE_LABELS: Record<Vibe, string> = {
   contemplative: 'Contemplative',
 };
 
+export type ListType = 'favourite' | 'friend' | 'wantto';
+
+export const LIST_TYPE_LABELS: Record<ListType, string> = {
+  favourite: 'Favourite',
+  friend: 'Friend Pick',
+  wantto: 'Want to Visit',
+};
+
+export const LIST_TYPE_PINS: Record<ListType, string> = {
+  favourite: '/icons/pin-favourite.svg',
+  friend: '/icons/pin-friend.svg',
+  wantto: '/icons/pin-wantto.svg',
+};
+
 export interface CoffeeSpot {
   id: number;
   name: string;
@@ -23,6 +37,7 @@ export interface CoffeeSpot {
   notes?: string | null;
   philosophy_quote?: string | null;
   vibe?: Vibe | null;
+  list_type?: ListType | null;
   rating?: number | null;
   tags?: string[] | null;
   photos?: string[] | null;
@@ -39,6 +54,7 @@ export interface CoffeeSpotInput {
   notes?: string;
   philosophy_quote?: string;
   vibe?: Vibe;
+  list_type?: ListType;
   rating?: number;
   tags?: string[];
   photos?: string[];

@@ -35,7 +35,7 @@ export function useSpots() {
   }
 
   return {
-    spots: data ?? [],
+    spots: Array.isArray(data) ? data : [],
     isLoading,
     error,
     addSpot,

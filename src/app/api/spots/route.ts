@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
         notes: body.notes,
         philosophy_quote: body.philosophy_quote,
         vibe: body.vibe,
+        list_type: body.list_type ?? 'favourite',
         rating: body.rating,
         tags: body.tags ?? [],
         photos: body.photos ?? [],

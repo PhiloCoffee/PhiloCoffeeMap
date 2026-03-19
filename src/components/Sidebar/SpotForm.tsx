@@ -3,10 +3,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import PhotoGallery from '@/components/UI/PhotoGallery';
 import EspressoLoader from '@/components/UI/EspressoLoader';
-import type { CoffeeSpot, CoffeeSpotInput, Vibe } from '@/types';
-import { VIBE_LABELS, VIBE_SYMBOLS } from '@/types';
+import type { CoffeeSpot, CoffeeSpotInput, Vibe, ListType } from '@/types';
+import { VIBE_LABELS, VIBE_SYMBOLS, LIST_TYPE_LABELS, LIST_TYPE_PINS } from '@/types';
 
 const VIBES: Vibe[] = ['study', 'chill', 'social', 'contemplative'];
+const LIST_TYPES: ListType[] = ['favourite', 'friend', 'wantto'];
 
 interface SpotFormProps {
   initialLat?: number;
@@ -28,6 +29,7 @@ export default function SpotForm({ initialLat, initialLng, existingSpot, onSave,
   const [notes, setNotes] = useState(existingSpot?.notes ?? '');
   const [quote, setQuote] = useState(existingSpot?.philosophy_quote ?? '');
   const [vibe, setVibe] = useState<Vibe | ''>(existingSpot?.vibe ?? '');
+  const [listType, setListType] = useState<ListType>(existingSpot?.list_type ?? 'favourite');
   const [rating, setRating] = useState(existingSpot?.rating ?? 0);
   const [tags, setTags] = useState((existingSpot?.tags ?? []).join(', '));
   const [photos, setPhotos] = useState<string[]>(existingSpot?.photos ?? []);
@@ -87,6 +89,7 @@ export default function SpotForm({ initialLat, initialLng, existingSpot, onSave,
         notes: notes.trim() || undefined,
         philosophy_quote: quote.trim() || undefined,
         vibe: (vibe || undefined) as Vibe | undefined,
+        list_type: listType,
         rating: rating || undefined,
         tags: tags ? tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
         photos,
@@ -172,6 +175,27 @@ export default function SpotForm({ initialLat, initialLng, existingSpot, onSave,
               >
                 <span className="text-base">{VIBE_SYMBOLS[v]}</span>
                 {VIBE_LABELS[v]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* List type */}
+        <div>
+          <label className="block text-cream/70 text-xs mb-1">List</label>
+          <div className="flex gap-2">
+            {LIST_TYPES.map((lt) => (
+              <button
+                key={lt}
+                type="button"
+                onClick={() => setListType(lt)}
+                className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full transition flex-1 justify-center ${
+                  listType === lt ? 'bg-caramel text-espresso' : 'border border-caramel/30 text-cream/60 hover:border-caramel'
+                }`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={LIST_TYPE_PINS[lt]} alt={lt} width={10} height={13} />
+                {LIST_TYPE_LABELS[lt]}
               </button>
             ))}
           </div>

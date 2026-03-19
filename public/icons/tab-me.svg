@@ -1,0 +1,10 @@
+<svg width="96" height="96" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- Head circle -->
+  <circle cx="12" cy="7" r="5.5" stroke="#2C1810" stroke-width="1.6" fill="none"/>
+  <!-- Omega inside head, subtle -->
+  <text x="12" y="7.5" text-anchor="middle" dominant-baseline="middle"
+    font-size="5.5" fill="#2C1810" font-family="Georgia,serif" font-style="italic" opacity="0.72">Ω</text>
+  <!-- Shoulders arc -->
+  <path d="M3 22 C3 16 21 16 21 22"
+    stroke="#2C1810" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+</svg>

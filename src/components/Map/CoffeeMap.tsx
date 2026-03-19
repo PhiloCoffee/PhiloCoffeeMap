@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Map,
   AdvancedMarker,
@@ -32,19 +32,21 @@ interface CoffeeMapProps {
   onMapClick: (lat: number, lng: number) => void;
 }
 
-/** Pan to user's location on first load (must be child of <Map>) */
-function MapGeolocation() {
+/** Pan to user's location on first load and expose position for a marker */
+function MapGeolocation({ onPosition }: { onPosition: (lat: number, lng: number) => void }) {
   const map = useMap();
   useEffect(() => {
     if (!map || !navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        map.panTo({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        const { latitude: lat, longitude: lng } = pos.coords;
+        map.panTo({ lat, lng });
         map.setZoom(14);
+        onPosition(lat, lng);
       },
-      () => {} // fallback: stay at Taipei default
+      () => {}
     );
-  }, [map]);
+  }, [map, onPosition]);
   return null;
 }
 
@@ -52,6 +54,7 @@ export default function CoffeeMap({
   spots, selectedSpot, pendingLat, pendingLng, onSpotClick, onMapClick,
 }: CoffeeMapProps) {
   const mapId = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID;
+  const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
 
   const handleMapClick = useCallback(
     (e: MapMouseEvent) => {
@@ -60,6 +63,10 @@ export default function CoffeeMap({
     },
     [onMapClick]
   );
+
+  const handlePosition = useCallback((lat: number, lng: number) => {
+    setUserPos({ lat, lng });
+  }, []);
 
   return (
     <Map
@@ -75,7 +82,20 @@ export default function CoffeeMap({
       onClick={handleMapClick}
       className="w-full h-full"
     >
-      <MapGeolocation />
+      <MapGeolocation onPosition={handlePosition} />
+
+      {userPos && (
+        <AdvancedMarker position={userPos} title="You are here">
+          <div style={{
+            width: 18,
+            height: 18,
+            borderRadius: '50%',
+            background: '#4A90E2',
+            border: '3px solid #fff',
+            boxShadow: '0 0 0 3px rgba(74,144,226,0.35)',
+          }} />
+        </AdvancedMarker>
+      )}
 
       {spots.map((spot) => (
         <AdvancedMarker
@@ -84,7 +104,7 @@ export default function CoffeeMap({
           onClick={() => onSpotClick(spot)}
           title={spot.name}
         >
-          <CoffeePin vibe={spot.vibe} selected={selectedSpot?.id === spot.id} />
+          <CoffeePin listType={spot.list_type} selected={selectedSpot?.id === spot.id} />
         </AdvancedMarker>
       ))}
 
