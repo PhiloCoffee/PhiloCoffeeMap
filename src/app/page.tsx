@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { APIProvider } from '@vis.gl/react-google-maps';
 import { useSpots } from '@/hooks/useSpots';
 import { useMapState } from '@/hooks/useMapState';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import SpotList from '@/components/Sidebar/SpotList';
 import SpotDetail from '@/components/Sidebar/SpotDetail';
 import SpotForm from '@/components/Sidebar/SpotForm';
@@ -26,7 +27,8 @@ const CoffeeMap = dynamic(() => import('@/components/Map/CoffeeMap'), {
 
 /** Visit log — spots with a visited_at date, newest first */
 function LogView({ spots, onSelect }: { spots: CoffeeSpot[]; onSelect: (spot: CoffeeSpot) => void }) {
-  const visited = spots
+  const safeSpots = Array.isArray(spots) ? spots : [];
+  const visited = safeSpots
     .filter((s) => s.visited_at)
     .sort((a, b) => new Date(b.visited_at!).getTime() - new Date(a.visited_at!).getTime());
 
@@ -83,10 +85,11 @@ function LogView({ spots, onSelect }: { spots: CoffeeSpot[]; onSelect: (spot: Co
 
 /** Me — stats overview */
 function MeView({ spots }: { spots: CoffeeSpot[] }) {
-  const visited = spots.filter((s) => s.visited_at).length;
+  const safeSpots = Array.isArray(spots) ? spots : [];
+  const visited = safeSpots.filter((s) => s.visited_at).length;
   const listCounts = (['favourite', 'friend', 'wantto'] as ListType[]).map((lt) => ({
     lt,
-    count: spots.filter((s) => (s.list_type ?? 'favourite') === lt).length,
+    count: safeSpots.filter((s) => (s.list_type ?? 'favourite') === lt).length,
   }));
 
   return (
@@ -99,7 +102,7 @@ function MeView({ spots }: { spots: CoffeeSpot[] }) {
       <div className="w-full max-w-sm space-y-3">
         <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: '#3D1A00' }} suppressHydrationWarning>
           <span className="text-cream/70 text-sm">Total spots</span>
-          <span className="text-caramel font-bold text-lg">{spots.length}</span>
+          <span className="text-caramel font-bold text-lg">{safeSpots.length}</span>
         </div>
         <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: '#3D1A00' }} suppressHydrationWarning>
           <span className="text-cream/70 text-sm">Places visited</span>
@@ -133,8 +136,10 @@ export default function Home() {
     startEdit,
   } = useMapState();
 
+  const isMobile = useIsMobile();
   const [showImport, setShowImport] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Mobile: start closed so map is visible first; desktop: start open
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [activeTab, setActiveTab] = useState<Tab>('map');
 
   async function handleSave(data: CoffeeSpotInput) {
@@ -155,9 +160,56 @@ export default function Home() {
   function handleSelectSpot(spot: CoffeeSpot) {
     openSpot(spot);
     setActiveTab('map');
+    setSidebarOpen(true);
+  }
+
+  // On mobile: auto-open sidebar when a spot is tapped or a pin is placed
+  function handleSpotClick(spot: CoffeeSpot) {
+    openSpot(spot);
+    setSidebarOpen(true);
+  }
+
+  function handleMapClick(lat: number, lng: number) {
+    startAddMode(lat, lng);
+    setSidebarOpen(true);
   }
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
+
+  /** Sidebar content — shared between desktop and mobile layouts */
+  const sidebarContent = isLoading ? (
+    <div className="flex items-center justify-center h-full">
+      <EspressoLoader />
+    </div>
+  ) : (
+    <>
+      {sidebarView === 'list' && (
+        <SpotList
+          spots={spots}
+          selectedId={selectedSpot?.id}
+          onSelect={openSpot}
+          onImport={() => setShowImport(true)}
+        />
+      )}
+      {sidebarView === 'detail' && selectedSpot && (
+        <SpotDetail
+          spot={selectedSpot}
+          onClose={closePanel}
+          onEdit={() => startEdit(selectedSpot)}
+          onDelete={handleDelete}
+        />
+      )}
+      {sidebarView === 'form' && (
+        <SpotForm
+          initialLat={pendingMarker?.lat}
+          initialLng={pendingMarker?.lng}
+          existingSpot={isAddMode ? null : selectedSpot}
+          onSave={handleSave}
+          onCancel={closePanel}
+        />
+      )}
+    </>
+  );
 
   return (
     <APIProvider apiKey={apiKey}>
@@ -168,70 +220,10 @@ export default function Home() {
 
           {/* ── MAP TAB ── */}
           {activeTab === 'map' && (
-            <div className="flex h-full">
-              {/* Sidebar */}
-              <aside
-                className={`
-                  flex-shrink-0 w-80 h-full flex flex-col
-                  border-r border-caramel/20 overflow-hidden
-                  transition-transform duration-300
-                  ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                  relative z-10
-                `}
-                style={{ background: '#3D1A00' }}
-                suppressHydrationWarning
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center h-full">
-                    <EspressoLoader />
-                  </div>
-                ) : (
-                  <>
-                    {sidebarView === 'list' && (
-                      <SpotList
-                        spots={spots}
-                        selectedId={selectedSpot?.id}
-                        onSelect={openSpot}
-                        onImport={() => setShowImport(true)}
-                      />
-                    )}
-                    {sidebarView === 'detail' && selectedSpot && (
-                      <SpotDetail
-                        spot={selectedSpot}
-                        onClose={closePanel}
-                        onEdit={() => startEdit(selectedSpot)}
-                        onDelete={handleDelete}
-                      />
-                    )}
-                    {sidebarView === 'form' && (
-                      <SpotForm
-                        initialLat={pendingMarker?.lat}
-                        initialLng={pendingMarker?.lng}
-                        existingSpot={isAddMode ? null : selectedSpot}
-                        onSave={handleSave}
-                        onCancel={closePanel}
-                      />
-                    )}
-                  </>
-                )}
-              </aside>
+            <div className="relative h-full">
 
-              {/* Toggle sidebar button */}
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="absolute top-1/2 -translate-y-1/2 z-20 w-6 h-12 flex items-center justify-center rounded-r-lg transition-all duration-300"
-                style={{
-                  background: '#C4783A',
-                  left: sidebarOpen ? '320px' : '0px',
-                }}
-                title={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
-                suppressHydrationWarning
-              >
-                <span className="text-espresso font-bold text-sm">{sidebarOpen ? '‹' : '›'}</span>
-              </button>
-
-              {/* Map */}
-              <main className="flex-1 h-full relative">
+              {/* Map — always full screen */}
+              <main className="absolute inset-0">
                 {isAddMode && (
                   <div
                     className="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-full text-sm font-lora italic animate-fade-in"
@@ -246,10 +238,86 @@ export default function Home() {
                   selectedSpot={selectedSpot}
                   pendingLat={pendingMarker?.lat}
                   pendingLng={pendingMarker?.lng}
-                  onSpotClick={openSpot}
-                  onMapClick={startAddMode}
+                  onSpotClick={handleSpotClick}
+                  onMapClick={handleMapClick}
                 />
               </main>
+
+              {isMobile ? (
+                <>
+                  {/* ── MOBILE: bottom sheet ── */}
+                  <aside
+                    className={`
+                      absolute bottom-0 left-0 right-0 z-20
+                      flex flex-col overflow-hidden
+                      rounded-t-2xl border-t border-caramel/30
+                      transition-transform duration-300 ease-in-out
+                      ${sidebarOpen ? 'translate-y-0' : 'translate-y-full'}
+                    `}
+                    style={{ background: '#3D1A00', height: '66.666%' }}
+                    suppressHydrationWarning
+                  >
+                    {/* Handle bar — tap to close */}
+                    <button
+                      onClick={() => setSidebarOpen(false)}
+                      className="flex-shrink-0 flex flex-col items-center gap-1 pt-3 pb-2 w-full"
+                      aria-label="Close panel"
+                    >
+                      <div className="w-10 h-1 rounded-full bg-caramel/40" />
+                      <svg width="16" height="10" viewBox="0 0 16 10" fill="none" className="text-caramel/50">
+                        <path d="M1 1.5L8 8.5L15 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+
+                    <div className="flex-1 overflow-hidden">
+                      {sidebarContent}
+                    </div>
+                  </aside>
+
+                  {/* Floating open button — visible when sheet is closed */}
+                  {!sidebarOpen && (
+                    <button
+                      onClick={() => setSidebarOpen(true)}
+                      className="absolute bottom-5 right-5 z-30 w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+                      style={{ background: '#C4783A' }}
+                      aria-label="Open panel"
+                      suppressHydrationWarning
+                    >
+                      <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
+                        <path d="M1 11L9 3L17 11" stroke="#1C0A00" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  )}
+                </>
+              ) : (
+                <>
+                  {/* ── DESKTOP: left sidebar ── */}
+                  <aside
+                    className={`
+                      absolute left-0 top-0 z-20
+                      w-80 h-full flex flex-col
+                      border-r border-caramel/20 overflow-hidden
+                      transition-transform duration-300
+                      ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                    `}
+                    style={{ background: '#3D1A00' }}
+                    suppressHydrationWarning
+                  >
+                    {sidebarContent}
+                  </aside>
+
+                  {/* Desktop toggle tab */}
+                  <button
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    className="absolute top-1/2 -translate-y-1/2 z-30 w-6 h-12 flex items-center justify-center rounded-r-lg transition-all duration-300"
+                    style={{ background: '#C4783A', left: sidebarOpen ? '320px' : '0px' }}
+                    title={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+                    suppressHydrationWarning
+                  >
+                    <span className="text-espresso font-bold text-sm">{sidebarOpen ? '‹' : '›'}</span>
+                  </button>
+                </>
+              )}
             </div>
           )}
 

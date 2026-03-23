@@ -69,6 +69,7 @@ export interface ImportRow {
   notes?: string;
   philosophy_quote?: string;
   vibe?: string;
+  list_type?: string;
   rating?: number;
   tags?: string;
   visited_at?: string;

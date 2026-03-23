@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
           notes: r.notes,
           philosophy_quote: r.philosophy_quote,
           vibe: r.vibe,
+          list_type: r.list_type ?? 'wantto',
           rating: r.rating,
           tags: r.tags ? r.tags.split(',').map((t) => t.trim()) : [],
           photos: [],

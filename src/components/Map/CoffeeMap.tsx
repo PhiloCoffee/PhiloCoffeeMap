@@ -33,10 +33,17 @@ interface CoffeeMapProps {
 }
 
 /** Pan to user's location on first load and expose position for a marker */
-function MapGeolocation({ onPosition }: { onPosition: (lat: number, lng: number) => void }) {
+function MapGeolocation({
+  onPosition,
+  onError,
+}: {
+  onPosition: (lat: number, lng: number) => void;
+  onError: () => void;
+}) {
   const map = useMap();
   useEffect(() => {
-    if (!map || !navigator.geolocation) return;
+    if (!map) return;
+    if (!navigator.geolocation) { onError(); return; }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords;
@@ -44,9 +51,9 @@ function MapGeolocation({ onPosition }: { onPosition: (lat: number, lng: number)
         map.setZoom(14);
         onPosition(lat, lng);
       },
-      () => {}
+      () => onError()
     );
-  }, [map, onPosition]);
+  }, [map, onPosition, onError]);
   return null;
 }
 
@@ -55,6 +62,7 @@ export default function CoffeeMap({
 }: CoffeeMapProps) {
   const mapId = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID;
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
+  const [geoBlocked, setGeoBlocked] = useState(false);
 
   const handleMapClick = useCallback(
     (e: MapMouseEvent) => {
@@ -68,9 +76,11 @@ export default function CoffeeMap({
     setUserPos({ lat, lng });
   }, []);
 
+  const handleGeoError = useCallback(() => setGeoBlocked(true), []);
+
   return (
     <Map
-      defaultCenter={{ lat: 25.0, lng: 121.5 }}
+      defaultCenter={{ lat: 39.95, lng: -75.16 }}
       defaultZoom={12}
       gestureHandling="greedy"
       disableDefaultUI={false}
@@ -82,7 +92,16 @@ export default function CoffeeMap({
       onClick={handleMapClick}
       className="w-full h-full"
     >
-      <MapGeolocation onPosition={handlePosition} />
+      <MapGeolocation onPosition={handlePosition} onError={handleGeoError} />
+
+      {geoBlocked && (
+        <div
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 px-3 py-1.5 rounded-full text-xs font-lora pointer-events-none"
+          style={{ background: 'rgba(28,10,0,0.85)', color: '#E8D5B7', border: '1px solid #C4783A55' }}
+        >
+          Location unavailable — requires HTTPS
+        </div>
+      )}
 
       {userPos && (
         <AdvancedMarker position={userPos} title="You are here">
