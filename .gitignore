@@ -31,6 +31,9 @@ buglog/
 # Design documents
 PhiloCoffeeMap_Architecture.pdf
 
+# debug screenshots
+/debug/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

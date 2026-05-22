@@ -27,6 +27,10 @@ export function useMapState() {
     setSidebarView('form');
   }, []);
 
+  const movePendingMarker = useCallback((lat: number, lng: number) => {
+    setPendingMarker({ lat, lng });
+  }, []);
+
   const closePanel = useCallback(() => {
     setSelectedSpot(null);
     setPendingMarker(null);
@@ -47,6 +51,7 @@ export function useMapState() {
     sidebarView,
     openSpot,
     startAddMode,
+    movePendingMarker,
     closePanel,
     startEdit,
     setSelectedSpot,
