@@ -1,0 +1,399 @@
+[
+  {
+    "id": 33,
+    "name": "Konditori Coffee",
+    "address": "40 S 17th St, Philadelphia, PA 19103, USA",
+    "lat": 39.951876,
+    "lng": -75.1688659,
+    "notes": "Google Maps saved place: Konditori Coffee",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Coffee shop"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.294Z",
+    "updated_at": "2026-05-22T02:20:34.294Z"
+  },
+  {
+    "id": 32,
+    "name": "La Colombe Coffee Workshop",
+    "address": "130 S 19th St, Philadelphia, PA 19103, USA",
+    "lat": 39.9507564,
+    "lng": -75.1723193,
+    "notes": "Google Maps: 4.5 (705), -10, Coffee shop",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Coffee shop"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.285Z",
+    "updated_at": "2026-05-22T02:20:34.285Z"
+  },
+  {
+    "id": 31,
+    "name": "Vibrant Coffee Roasters & Bakery",
+    "address": "222 W Rittenhouse Square 1st Floor, Philadelphia, PA 19103, USA",
+    "lat": 39.9491835,
+    "lng": -75.1733603,
+    "notes": "Google Maps: 4.6 (293), -10, Cafe",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Cafe"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.276Z",
+    "updated_at": "2026-05-22T02:20:34.276Z"
+  },
+  {
+    "id": 30,
+    "name": "Char & Stave",
+    "address": "8441 Germantown Ave, Philadelphia, PA 19118, USA",
+    "lat": 40.0761042,
+    "lng": -75.2061641,
+    "notes": "Google Maps: 4.6/4.7, -20, Coffee shop",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Coffee shop"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.267Z",
+    "updated_at": "2026-05-22T02:20:34.267Z"
+  },
+  {
+    "id": 29,
+    "name": "Thank You Thank You",
+    "address": "700 Sansom St, Philadelphia, PA 19106, USA",
+    "lat": 39.9484336,
+    "lng": -75.1526683,
+    "notes": "Google Maps: 4.9 (405), -10, Coffee shop",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Coffee shop"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.257Z",
+    "updated_at": "2026-05-22T02:20:34.257Z"
+  },
+  {
+    "id": 28,
+    "name": "Persimmon Coffee",
+    "address": "11 W Girard Ave, Philadelphia, PA 19123, USA",
+    "lat": 39.9689063,
+    "lng": -75.1348704,
+    "notes": "Google Maps: 4.8 (258), -10, Coffee shop",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Coffee shop"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.245Z",
+    "updated_at": "2026-05-22T02:20:34.245Z"
+  },
+  {
+    "id": 27,
+    "name": "Elixr Coffee Roasters",
+    "address": "207 S Sydenham St, Philadelphia, PA 19102, USA",
+    "lat": 39.9493231,
+    "lng": -75.1667136,
+    "notes": "Google Maps: 4.6 (397), -10, Coffee shop",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Coffee shop"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.238Z",
+    "updated_at": "2026-05-22T02:20:34.238Z"
+  },
+  {
+    "id": 26,
+    "name": "Ray's Cafe & Tea House",
+    "address": "141 N 9th St, Philadelphia, PA 19107, USA",
+    "lat": 39.95463030000001,
+    "lng": -75.1542576,
+    "notes": "Google Maps: 4.4 (545), -30, Cafe",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Cafe"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.228Z",
+    "updated_at": "2026-05-22T02:20:34.228Z"
+  },
+  {
+    "id": 25,
+    "name": "Rival Bros Coffee Bar",
+    "address": "2400 Lombard St, Philadelphia, PA 19146, USA",
+    "lat": 39.946499,
+    "lng": -75.1806443,
+    "notes": "Google Maps: 4.6 (460), -10, Coffee shop",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Coffee shop"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.218Z",
+    "updated_at": "2026-05-22T02:20:34.218Z"
+  },
+  {
+    "id": 24,
+    "name": "Time & Peace Café and Gallery",
+    "address": "36 S 7th St, Philadelphia, PA 19106, USA",
+    "lat": 39.9498279,
+    "lng": -75.152458,
+    "notes": "Google Maps: 4.8 (204), -10, Cafe",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Cafe"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.209Z",
+    "updated_at": "2026-05-22T02:20:34.209Z"
+  },
+  {
+    "id": 23,
+    "name": "Alchemy Coffee",
+    "address": "119 S 21st St, Philadelphia, PA 19103, USA",
+    "lat": 39.9511237,
+    "lng": -75.1755163,
+    "notes": "Google Maps: 4.4 (269), -10, Coffee shop",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Coffee shop"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.195Z",
+    "updated_at": "2026-05-22T02:20:34.195Z"
+  },
+  {
+    "id": 22,
+    "name": "Two Persons",
+    "address": "Bok Building, 821 Dudley St, Philadelphia, PA 19148, USA",
+    "lat": 39.9249137,
+    "lng": -75.1601514,
+    "notes": "Google Maps: 4.6 (155), -10, Cafe",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Cafe"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.186Z",
+    "updated_at": "2026-05-22T02:20:34.186Z"
+  },
+  {
+    "id": 21,
+    "name": "Càphê Roasters",
+    "address": "3400 J St G1, Philadelphia, PA 19134, USA",
+    "lat": 39.9993447,
+    "lng": -75.1091197,
+    "notes": "Google Maps: 4.8 (522), -20, Cafe",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Cafe"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.174Z",
+    "updated_at": "2026-05-22T02:20:34.174Z"
+  },
+  {
+    "id": 20,
+    "name": "Sister Cities Café",
+    "address": "200 N 18th St, Philadelphia, PA 19103, USA",
+    "lat": 39.9579157,
+    "lng": -75.1691677,
+    "notes": "Google Maps: 4.2 (85), -10, Cafe",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Cafe"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.157Z",
+    "updated_at": "2026-05-22T02:20:34.157Z"
+  },
+  {
+    "id": 19,
+    "name": "Chapterhouse Cafe & Gallery",
+    "address": "620 S 9th St, Philadelphia, PA 19147, USA",
+    "lat": 39.9419028,
+    "lng": -75.1573083,
+    "notes": "Google Maps: 4.6 (602), -10, Cafe",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Cafe"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.141Z",
+    "updated_at": "2026-05-22T02:20:34.141Z"
+  },
+  {
+    "id": 18,
+    "name": "Top Hat Coffee Lounge",
+    "address": "3131 Walnut St, Philadelphia, PA 19104, USA",
+    "lat": 39.9524605,
+    "lng": -75.18728639999999,
+    "notes": "Google Maps: 4.7 (246), -20, Coffee shop",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Coffee shop"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:20:34.130Z",
+    "updated_at": "2026-05-22T02:20:34.130Z"
+  },
+  {
+    "id": 14,
+    "name": "Bluestone Lane Rittenhouse Café",
+    "address": "1701 Locust St, Philadelphia, PA 19103, USA",
+    "lat": 39.9489124,
+    "lng": -75.1694886,
+    "notes": "Google Maps: 4.2 (692), $$, Coffee shop",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Coffee shop"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:16:54.872Z",
+    "updated_at": "2026-05-22T02:16:54.872Z"
+  },
+  {
+    "id": 9,
+    "name": "Cafe Duskaia",
+    "address": "1007 S 9th St, Philadelphia, PA 19147, USA",
+    "lat": 39.9373334,
+    "lng": -75.1580785,
+    "notes": "Google Maps: 4.9 (121), $10-20, Espresso bar",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Espresso bar"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:16:54.792Z",
+    "updated_at": "2026-05-22T02:16:54.792Z"
+  },
+  {
+    "id": 5,
+    "name": "Peddler Coffee",
+    "address": "2100 Spring St, Philadelphia, PA 19103, USA",
+    "lat": 39.95824760000001,
+    "lng": -75.1742331,
+    "notes": "Google Maps: 4.6 (432), $1-10, Coffee shop",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Coffee shop"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:16:54.731Z",
+    "updated_at": "2026-05-22T02:16:54.731Z"
+  },
+  {
+    "id": 2,
+    "name": "Café Tolia",
+    "address": "26 N 3rd St, Philadelphia, PA 19106, USA",
+    "lat": 39.9509946,
+    "lng": -75.1458069,
+    "notes": "Google Maps: 4.8 (455), $10-20, Coffee shop",
+    "philosophy_quote": null,
+    "vibe": null,
+    "list_type": "wantto",
+    "rating": null,
+    "tags": [
+      "Coffee shop"
+    ],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-05-22T02:16:54.679Z",
+    "updated_at": "2026-05-22T02:16:54.679Z"
+  },
+  {
+    "id": 1,
+    "name": "Molly Tea (UPenn)",
+    "address": "3720 Chestnut St 1st floor #B, Philadelphia, PA 19104, USA",
+    "lat": 39.9548671,
+    "lng": -75.1975649,
+    "notes": null,
+    "philosophy_quote": "Nice milk tea",
+    "vibe": "chill",
+    "list_type": "friend",
+    "rating": 4,
+    "tags": [],
+    "photos": [],
+    "visited_at": null,
+    "created_at": "2026-04-08T07:13:58.068Z",
+    "updated_at": "2026-04-08T07:13:58.068Z"
+  }
+]

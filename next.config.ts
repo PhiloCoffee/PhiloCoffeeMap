@@ -1,6 +1,8 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
+  transpilePackages: ['@vis.gl/react-google-maps'],
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**' },
