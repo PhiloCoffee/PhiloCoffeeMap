@@ -17,6 +17,21 @@ interface SpotFormProps {
   onCancel: () => void;
 }
 
+interface SpotFormDraft {
+  name: string;
+  address: string;
+  notes: string;
+  quote: string;
+  vibe: Vibe | '';
+  listType: ListType;
+  rating: number;
+  tags: string;
+  photos: string[];
+  visitedAt: string;
+  lat: number;
+  lng: number;
+}
+
 function reverseGeocode(lat: number, lng: number): Promise<string> {
   return fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`)
     .then((r) => r.json())
@@ -24,24 +39,48 @@ function reverseGeocode(lat: number, lng: number): Promise<string> {
 }
 
 export default function SpotForm({ initialLat, initialLng, existingSpot, onSave, onCancel }: SpotFormProps) {
-  const [name, setName] = useState(existingSpot?.name ?? '');
-  const [address, setAddress] = useState(existingSpot?.address ?? '');
-  const [notes, setNotes] = useState(existingSpot?.notes ?? '');
-  const [quote, setQuote] = useState(existingSpot?.philosophy_quote ?? '');
-  const [vibe, setVibe] = useState<Vibe | ''>(existingSpot?.vibe ?? '');
-  const [listType, setListType] = useState<ListType>(existingSpot?.list_type ?? 'favourite');
-  const [rating, setRating] = useState(existingSpot?.rating ?? 0);
-  const [tags, setTags] = useState((existingSpot?.tags ?? []).join(', '));
-  const [photos, setPhotos] = useState<string[]>(existingSpot?.photos ?? []);
-  const [visitedAt, setVisitedAt] = useState(
-    existingSpot?.visited_at ? existingSpot.visited_at.slice(0, 10) : ''
-  );
+  const draftKey = existingSpot ? `philo-spot-form-edit-${existingSpot.id}` : 'philo-spot-form-new';
+  const baseDraft: SpotFormDraft = {
+    name: existingSpot?.name ?? '',
+    address: existingSpot?.address ?? '',
+    notes: existingSpot?.notes ?? '',
+    quote: existingSpot?.philosophy_quote ?? '',
+    vibe: existingSpot?.vibe ?? '',
+    listType: existingSpot?.list_type ?? 'favourite',
+    rating: existingSpot?.rating ?? 0,
+    tags: (existingSpot?.tags ?? []).join(', '),
+    photos: existingSpot?.photos ?? [],
+    visitedAt: existingSpot?.visited_at ? existingSpot.visited_at.slice(0, 10) : '',
+    lat: existingSpot?.lat ?? initialLat ?? 25.0,
+    lng: existingSpot?.lng ?? initialLng ?? 121.5,
+  };
+  const [initialDraft] = useState<SpotFormDraft>(() => {
+    if (typeof window === 'undefined') return baseDraft;
+    const saved = window.sessionStorage.getItem(draftKey);
+    if (!saved) return baseDraft;
+    try {
+      return { ...baseDraft, ...JSON.parse(saved) };
+    } catch {
+      return baseDraft;
+    }
+  });
+
+  const [name, setName] = useState(initialDraft.name);
+  const [address, setAddress] = useState(initialDraft.address);
+  const [notes, setNotes] = useState(initialDraft.notes);
+  const [quote, setQuote] = useState(initialDraft.quote);
+  const [vibe, setVibe] = useState<Vibe | ''>(initialDraft.vibe);
+  const [listType, setListType] = useState<ListType>(initialDraft.listType);
+  const [rating, setRating] = useState(initialDraft.rating);
+  const [tags, setTags] = useState(initialDraft.tags);
+  const [photos, setPhotos] = useState<string[]>(initialDraft.photos);
+  const [visitedAt, setVisitedAt] = useState(initialDraft.visitedAt);
   const [saving, setSaving] = useState(false);
   const [geocoding, setGeocoding] = useState(false);
 
   // Internal lat/lng: can be updated by Places Autocomplete
-  const [lat, setLat] = useState(existingSpot?.lat ?? initialLat ?? 25.0);
-  const [lng, setLng] = useState(existingSpot?.lng ?? initialLng ?? 121.5);
+  const [lat, setLat] = useState(initialDraft.lat);
+  const [lng, setLng] = useState(initialDraft.lng);
 
   // Places Autocomplete
   const placesLib = useMapsLibrary('places');
@@ -65,6 +104,34 @@ export default function SpotForm({ initialLat, initialLng, existingSpot, onSave,
       }
     });
   }, [placesLib]);
+
+  useEffect(() => {
+    if (existingSpot || initialLat == null || initialLng == null) return;
+    setLat(initialLat);
+    setLng(initialLng);
+  }, [existingSpot, initialLat, initialLng]);
+
+  useEffect(() => {
+    const draft: SpotFormDraft = {
+      name,
+      address,
+      notes,
+      quote,
+      vibe,
+      listType,
+      rating,
+      tags,
+      photos,
+      visitedAt,
+      lat,
+      lng,
+    };
+    window.sessionStorage.setItem(draftKey, JSON.stringify(draft));
+  }, [draftKey, name, address, notes, quote, vibe, listType, rating, tags, photos, visitedAt, lat, lng]);
+
+  function clearDraft() {
+    window.sessionStorage.removeItem(draftKey);
+  }
 
   async function handleGeocode() {
     setGeocoding(true);
@@ -95,9 +162,15 @@ export default function SpotForm({ initialLat, initialLng, existingSpot, onSave,
         photos,
         visited_at: visitedAt || undefined,
       });
+      clearDraft();
     } finally {
       setSaving(false);
     }
+  }
+
+  function handleCancel() {
+    clearDraft();
+    onCancel();
   }
 
   if (saving) {
@@ -114,7 +187,7 @@ export default function SpotForm({ initialLat, initialLng, existingSpot, onSave,
         <h2 className="font-playfair text-cream text-xl">
           {existingSpot ? 'Edit Spot' : 'New Spot'}
         </h2>
-        <button type="button" onClick={onCancel} className="text-cream/40 hover:text-cream text-xl">×</button>
+        <button type="button" onClick={handleCancel} className="text-cream/40 hover:text-cream text-xl">×</button>
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
@@ -276,7 +349,7 @@ export default function SpotForm({ initialLat, initialLng, existingSpot, onSave,
         <button type="submit" className="btn-primary flex-1">
           {existingSpot ? 'Save Changes' : 'Add Spot'}
         </button>
-        <button type="button" onClick={onCancel} className="btn-secondary flex-1">
+        <button type="button" onClick={handleCancel} className="btn-secondary flex-1">
           Cancel
         </button>
       </div>

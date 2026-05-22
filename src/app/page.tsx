@@ -132,6 +132,7 @@ export default function Home() {
     sidebarView,
     openSpot,
     startAddMode,
+    movePendingMarker,
     closePanel,
     startEdit,
   } = useMapState();
@@ -165,11 +166,22 @@ export default function Home() {
 
   // On mobile: auto-open sidebar when a spot is tapped or a pin is placed
   function handleSpotClick(spot: CoffeeSpot) {
+    if (sidebarView === 'form') {
+      setSidebarOpen(true);
+      return;
+    }
     openSpot(spot);
     setSidebarOpen(true);
   }
 
   function handleMapClick(lat: number, lng: number) {
+    if (sidebarView === 'form') {
+      if (isAddMode) {
+        movePendingMarker(lat, lng);
+      }
+      setSidebarOpen(true);
+      return;
+    }
     startAddMode(lat, lng);
     setSidebarOpen(true);
   }

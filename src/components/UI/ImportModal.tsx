@@ -11,6 +11,94 @@ interface ImportModalProps {
 
 const LIST_TYPES: ListType[] = ['favourite', 'friend', 'wantto'];
 
+interface ImportDebugStep {
+  goal: string;
+  status: 'pending' | 'passed' | 'failed' | 'skipped';
+  detail?: string;
+}
+
+type UrlResult =
+  | { rows: ImportRow[]; source: string; debugSteps?: ImportDebugStep[] }
+  | { names: string[]; source: string; debugSteps?: ImportDebugStep[] };
+
+const PASTE_METADATA = new Set([
+  'note',
+  'coffee shop',
+  'italian',
+  'liquor store',
+  'restaurant',
+  'espresso bar',
+  'chinese',
+  'karaoke bar',
+  'bowling alley',
+  'department store',
+  'clothing store',
+  'greek',
+  'fencing school',
+  'police department',
+]);
+
+const COFFEE_CATEGORIES = new Set([
+  'coffee shop',
+  'cafe',
+  'espresso bar',
+]);
+
+function isRating(line: string) {
+  return /^\d(?:\.\d)?\([\d,]+\)$/.test(line);
+}
+
+function isPrice(line: string) {
+  return /^\$[\d–-]*(?:\s*·.*)?$/.test(line) || /^\${1,4}$/.test(line);
+}
+
+function categoryFromLine(line: string) {
+  const category = line.replace(/^·\s*/, '').trim();
+  return /^[\p{L} &'-]+$/u.test(category) ? category.toLowerCase() : null;
+}
+
+function extractCoffeePlaceNames(text: string) {
+  const names: string[] = [];
+  const seen = new Set<string>();
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  for (let i = 0; i < lines.length; i++) {
+    const possibleName = lines[i].replace(/^·\s*/, '').trim();
+    const lower = possibleName.toLowerCase();
+    if (
+      possibleName === '' ||
+      lower === 'note' ||
+      isRating(possibleName) ||
+      isPrice(possibleName) ||
+      PASTE_METADATA.has(lower)
+    ) {
+      continue;
+    }
+
+    const block = lines.slice(i + 1, i + 6).map((line) => line.replace(/^·\s*/, '').trim());
+    const category = block.map(categoryFromLine).find((value): value is string => Boolean(value));
+    if (category && !COFFEE_CATEGORIES.has(category)) continue;
+    if (!category && !/\b(coffee|cafe|café|espresso)\b/i.test(possibleName)) continue;
+
+    let name = possibleName;
+    if (/^[A-Za-z .'-]+$/.test(possibleName) && lines[i + 1]?.toLowerCase() === 'new jersey') {
+      name = `${possibleName}, New Jersey`;
+      i++;
+    }
+
+    const key = name.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      names.push(name);
+    }
+  }
+
+  return names;
+}
+
 export default function ImportModal({ onClose, onImported }: ImportModalProps) {
   const [tab, setTab] = useState<'url' | 'file' | 'paste'>('url');
 
@@ -21,11 +109,9 @@ export default function ImportModal({ onClose, onImported }: ImportModalProps) {
   // --- URL import state ---
   const [urlInput, setUrlInput] = useState('');
   const [urlListType, setUrlListType] = useState<ListType>('wantto');
-  const [urlResult, setUrlResult] = useState<
-    { rows: ImportRow[]; source: string } | { names: string[]; source: string } | null
-  >(null);
+  const [urlResult, setUrlResult] = useState<UrlResult | null>(null);
   const [urlGeocoded, setUrlGeocoded] = useState<{ results: ImportRow[]; failed: string[] } | null>(null);
-  const [urlGuide, setUrlGuide] = useState<{ urlType: string; finalUrl: string } | null>(null);
+  const [urlGuide, setUrlGuide] = useState<{ urlType: string; finalUrl: string; debugSteps?: ImportDebugStep[] } | null>(null);
 
   // --- Paste import state ---
   const [pasteText, setPasteText] = useState('');
@@ -52,7 +138,11 @@ export default function ImportModal({ onClose, onImported }: ImportModalProps) {
       const data = await res.json();
       // 422 = known failure — show guide instead of throwing
       if (res.status === 422) {
-        setUrlGuide({ urlType: data.urlType ?? 'unknown', finalUrl: data.finalUrl ?? urlInput });
+        setUrlGuide({
+          urlType: data.urlType ?? 'unknown',
+          finalUrl: data.finalUrl ?? urlInput,
+          debugSteps: data.debugSteps,
+        });
         return;
       }
       if (data.error) throw new Error(data.error);
@@ -83,10 +173,11 @@ export default function ImportModal({ onClose, onImported }: ImportModalProps) {
   }
 
   async function handleUrlImport() {
-    const rows =
-      urlResult && 'rows' in urlResult
+    const rows = urlGeocoded
+      ? urlGeocoded.results
+      : urlResult && 'rows' in urlResult
         ? urlResult.rows.map((r) => ({ ...r, list_type: urlListType }))
-        : urlGeocoded?.results ?? [];
+        : [];
     if (rows.length === 0) return;
     setLoading(true);
     setError(null);
@@ -108,11 +199,14 @@ export default function ImportModal({ onClose, onImported }: ImportModalProps) {
     }
   }
 
-  const urlRows =
-    urlResult && 'rows' in urlResult
+  const urlRows = urlGeocoded
+    ? urlGeocoded.results
+    : urlResult && 'rows' in urlResult
       ? urlResult.rows
-      : urlGeocoded?.results ?? [];
+      : [];
   const urlFailed = urlGeocoded?.failed ?? [];
+  const urlDebugSteps = urlResult?.debugSteps ?? urlGuide?.debugSteps ?? [];
+  const extractedPasteNames = extractCoffeePlaceNames(pasteText);
 
   // --- File import handlers ---
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -168,7 +262,7 @@ export default function ImportModal({ onClose, onImported }: ImportModalProps) {
 
   // --- Paste import handlers ---
   async function handleGeocode() {
-    const names = pasteText.split('\n').map((l) => l.trim()).filter(Boolean);
+    const names = extractCoffeePlaceNames(pasteText);
     if (names.length === 0) return;
     setLoading(true);
     setError(null);
@@ -245,6 +339,30 @@ export default function ImportModal({ onClose, onImported }: ImportModalProps) {
           {/* --- URL TAB --- */}
           {tab === 'url' && (
             <>
+              {urlDebugSteps.length > 0 && (
+                <div className="border border-caramel/20 rounded-lg p-3 space-y-2">
+                  <p className="text-caramel text-xs font-bold uppercase tracking-wide">Debug goals</p>
+                  <ol className="space-y-1">
+                    {urlDebugSteps.map((step, i) => (
+                      <li key={`${step.goal}-${i}`} className="text-xs font-lora text-cream/70 flex gap-2">
+                        <span className={
+                          step.status === 'passed' ? 'text-green-400' :
+                          step.status === 'failed' ? 'text-red-400' :
+                          step.status === 'skipped' ? 'text-cream/35' :
+                          'text-amber-400'
+                        }>
+                          {step.status}
+                        </span>
+                        <span>
+                          {step.goal}
+                          {step.detail && <span className="text-cream/35"> - {step.detail}</span>}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
               {!urlResult && !urlGuide && !loading && (
                 <>
                   <div className="text-cream/60 text-sm font-lora space-y-1">
@@ -282,7 +400,9 @@ export default function ImportModal({ onClose, onImported }: ImportModalProps) {
               {urlGuide && (
                 <div className="space-y-4">
                   <div className="bg-caramel/10 border border-caramel/30 rounded-lg p-3 text-sm font-lora text-cream/80">
-                    {urlGuide.urlType === 'placelists'
+                    {urlGuide.urlType === 'shortlink'
+                      ? <p>This <strong className="text-caramel">Google Maps app short link</strong> does not expose its destination to the importer. Open it in Google Maps, copy the place name, then use Paste Names.</p>
+                      : urlGuide.urlType === 'placelists'
                       ? <p>This is a <strong className="text-caramel">Google Saved Places list</strong>. Google loads its content with JavaScript, so it can&apos;t be read automatically. Use one of the methods below instead:</p>
                       : <p>Couldn&apos;t extract places from this URL. Try one of these instead:</p>
                     }
@@ -363,8 +483,8 @@ export default function ImportModal({ onClose, onImported }: ImportModalProps) {
               {!pasteResults && (
                 <>
                   <div className="text-cream/60 text-sm font-lora space-y-1">
-                    <p>Open your Google Maps list, copy the place names (one per line), and paste below.</p>
-                    <p className="text-cream/40">Or for all your saved places at once, use <span className="text-caramel">Google Takeout</span> → export "Saved" → drop the JSON in the File tab.</p>
+                    <p>Paste place names or a copied Google Maps block. Ratings, prices, categories, and notes are ignored automatically.</p>
+                    <p className="text-cream/40">Or for all your saved places at once, use <span className="text-caramel">Google Takeout</span> → export &quot;Saved&quot; → drop the JSON in the File tab.</p>
                   </div>
 
                   <div>
@@ -385,10 +505,15 @@ export default function ImportModal({ onClose, onImported }: ImportModalProps) {
                   <textarea
                     value={pasteText}
                     onChange={(e) => setPasteText(e.target.value)}
-                    placeholder={"Café de Flore\nBlue Bottle Coffee\nMonmouth Coffee Company"}
+                    placeholder={"Cafe Tolia\n4.8(455)\n$10-20\n· Coffee shop\n\nPeddler Coffee"}
                     rows={8}
                     className="w-full bg-espresso border border-caramel/20 rounded-lg p-3 text-cream font-lora text-sm resize-none focus:outline-none focus:border-caramel placeholder:text-cream/25"
                   />
+                  {pasteText.trim() && (
+                    <p className="text-cream/40 text-xs font-lora">
+                      {extractedPasteNames.length} place{extractedPasteNames.length !== 1 ? 's' : ''} detected.
+                    </p>
+                  )}
                 </>
               )}
 

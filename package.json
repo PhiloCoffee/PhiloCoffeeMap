@@ -9,8 +9,11 @@
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:seed": "node scripts/seed-spots.mjs",
     "db:studio": "drizzle-kit studio",
-    "icons": "node scripts/generate-icons.mjs"
+    "icons": "node scripts/generate-icons.mjs",
+    "debug": "node scripts/debug-screenshots.mjs",
+    "debug:manual": "node scripts/debug-screenshots.mjs --manual"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1009.0",

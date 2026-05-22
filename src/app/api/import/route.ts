@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { coffeeSpots } from '@/lib/db/schema';
+import { createSpot } from '@/lib/spotsRepository';
 import { parseCSV, parseGeoJSON, parseKML } from '@/lib/parsers';
-import type { ImportRow } from '@/types';
+import type { ImportRow, ListType, Vibe } from '@/types';
 
 export async function POST(req: NextRequest) {
   try {
@@ -34,25 +33,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No valid rows found' }, { status: 400 });
     }
 
-    const inserted = await db
-      .insert(coffeeSpots)
-      .values(
-        rows.map((r) => ({
-          name: r.name,
-          address: r.address,
-          lat: r.lat,
-          lng: r.lng,
-          notes: r.notes,
-          philosophy_quote: r.philosophy_quote,
-          vibe: r.vibe,
-          list_type: r.list_type ?? 'wantto',
-          rating: r.rating,
-          tags: r.tags ? r.tags.split(',').map((t) => t.trim()) : [],
-          photos: [],
-          visited_at: r.visited_at ? new Date(r.visited_at) : null,
-        }))
-      )
-      .returning({ id: coffeeSpots.id });
+    const inserted = await Promise.all(rows.map((r) => createSpot({
+      name: r.name,
+      address: r.address,
+      lat: r.lat,
+      lng: r.lng,
+      notes: r.notes,
+      philosophy_quote: r.philosophy_quote,
+      vibe: r.vibe as Vibe | undefined,
+      list_type: (r.list_type ?? 'wantto') as ListType,
+      rating: r.rating,
+      tags: r.tags ? r.tags.split(',').map((t) => t.trim()) : [],
+      photos: [],
+      visited_at: r.visited_at,
+    })));
 
     return NextResponse.json({ inserted: inserted.length });
   } catch (err) {
